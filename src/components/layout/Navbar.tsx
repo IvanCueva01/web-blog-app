@@ -13,8 +13,8 @@ import { MenuIcon, SearchIcon, XIcon } from "lucide-react";
 const navLinks = [
   { href: "/", label: "HOME" },
   { href: "/posts", label: "POSTS" },
-  { href: "/works", label: "WORKS" },
   { href: "/features", label: "FEATURES" },
+  { href: "/my-works", label: "MY WORKS" },
 ];
 
 export default function Navbar() {

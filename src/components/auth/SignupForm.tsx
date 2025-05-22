@@ -1,25 +1,12 @@
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Link } from "react-router";
 
-function SignupForm() {
+export default function SignupForm() {
   return (
     <div className={""}>
       <Card>
-        <CardHeader>
-          <CardTitle>Sign up to your account</CardTitle>
-          <CardDescription>
-            Enter your email below to sign up to your account
-          </CardDescription>
-        </CardHeader>
         <CardContent>
           <form>
             <div className="flex flex-col gap-6">
@@ -50,5 +37,3 @@ function SignupForm() {
     </div>
   );
 }
-
-export default SignupForm;
