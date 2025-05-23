@@ -47,6 +47,22 @@ export const ArticleController = {
     }
   },
 
+  async getAllUniqueCategories(req: Request, res: Response): Promise<void> {
+    try {
+      const categories = await ArticleService.findAllCategories();
+      res.status(200).json({
+        message: "Categories retrieved successfully",
+        categories,
+      });
+    } catch (error) {
+      console.error("[ArticleController.getAllUniqueCategories] Error:", error);
+      res.status(500).json({
+        message: "Error retrieving categories",
+        error: (error as Error).message,
+      });
+    }
+  },
+
   async getArticleById(req: Request, res: Response): Promise<void> {
     try {
       const id = parseInt(req.params.id);
@@ -86,6 +102,53 @@ export const ArticleController = {
       console.error("[ArticleController.getArticleBySlug] Error:", error);
       res.status(500).json({
         message: "Error retrieving article",
+        error: (error as Error).message,
+      });
+    }
+  },
+
+  async getMyArticles(req: Request, res: Response): Promise<void> {
+    try {
+      const user = req.user as IUser;
+      if (!user || !user.id) {
+        res
+          .status(403)
+          .json({ message: "User not authenticated or user ID missing." });
+        return;
+      }
+
+      const page = parseInt(req.query.page as string) || 1;
+      const limit = parseInt(req.query.limit as string) || 10; // Default to 10, can be overridden
+      const offset = (page - 1) * limit;
+
+      // Filters will include the authenticated user's ID
+      // and any other query params like searchTerm if we want to support it here
+      const filters = {
+        authorId: user.id,
+        searchTerm: req.query.q as string | undefined,
+        // category: req.query.category as string | undefined, // Optionally add category filter for user's own articles
+      };
+
+      const { articles, totalCount } = await ArticleService.findAll(
+        filters,
+        limit,
+        offset
+      );
+
+      res.status(200).json({
+        message: "User's articles retrieved successfully",
+        data: articles,
+        pagination: {
+          currentPage: page,
+          totalPages: Math.ceil(totalCount / limit),
+          totalItems: totalCount,
+          itemsPerPage: limit,
+        },
+      });
+    } catch (error) {
+      console.error("[ArticleController.getMyArticles] Error:", error);
+      res.status(500).json({
+        message: "Error retrieving user's articles",
         error: (error as Error).message,
       });
     }

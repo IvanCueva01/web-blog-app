@@ -59,10 +59,8 @@ export default function BlogEditor({
   const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newTitle = e.target.value;
     setTitle(newTitle);
-    if (!articleToEdit?.slug || !slug) {
-      // Auto-generate slug if not editing existing slug or if slug is empty
-      setSlug(generateSlug(newTitle));
-    }
+    // Siempre genera el slug desde el título, incluso en modo edición
+    setSlug(generateSlug(newTitle));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {

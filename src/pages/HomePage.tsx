@@ -1,12 +1,47 @@
 import MainLayout from "@/components/layout/MainLayout";
 import HeroSection from "@/components/layout/HeroSection";
-import { mockArticles } from "@/data/mockArticles";
 import { Link } from "react-router-dom";
 import BlogCardPost from "@/components/blog/BlogCardPost";
+import { useEffect, useState } from "react"; // Import useEffect and useState
+import { articleService } from "@/services/articleService"; // Import articleService
+import type { IArticleFrontEnd } from "@/types/article.types"; // Import IArticleFrontEnd
+import { AlertTriangle, Loader2 } from "lucide-react"; // For loading/error display
 // import BlogList from "@/components/blog/BlogList"; // Example for later
 
 export default function HomePage() {
-  const displayedArticles = mockArticles.slice(0, 6);
+  const [articles, setArticles] = useState<IArticleFrontEnd[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchLatestArticles = async () => {
+      setIsLoading(true);
+      setError(null);
+      try {
+        const response = await articleService.getAllArticles({ limit: 6 });
+        console.log(
+          "[HomePage Effect] Fetched response.articles:",
+          response.articles
+        );
+        setArticles(response.articles || []);
+      } catch (err: any) {
+        console.error(
+          "[HomePage Effect] Failed to fetch latest articles:",
+          err
+        );
+        setError(
+          err.message || "An unexpected error occurred while fetching posts."
+        );
+        setArticles([]);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchLatestArticles();
+  }, []);
+
+  console.log("[HomePage Render] State:", { isLoading, error, articles });
 
   return (
     <MainLayout>
@@ -20,14 +55,31 @@ export default function HomePage() {
           Latest Posts
         </h2>
 
-        {displayedArticles.length > 0 ? (
+        {isLoading && (
+          <div className="flex justify-center items-center py-10">
+            <Loader2 className="h-12 w-12 animate-spin text-orange-500" />
+            <p className="ml-3 text-gray-600 text-lg">Loading posts...</p>
+          </div>
+        )}
+
+        {error && !isLoading && (
+          <div className="text-center py-10 text-red-600 bg-red-50 p-6 rounded-lg shadow-md">
+            <AlertTriangle className="h-10 w-10 mx-auto mb-3 text-red-500" />
+            <p className="text-xl font-semibold">Failed to load posts</p>
+            <p className="text-md">{error}</p>
+          </div>
+        )}
+
+        {!isLoading && !error && articles.length > 0 ? (
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {displayedArticles.map((article) => (
+            {articles.map((article) => (
               <BlogCardPost key={article.id} article={article} />
             ))}
           </div>
-        ) : (
-          <p className="text-center text-gray-500">
+        ) : null}
+
+        {!isLoading && !error && articles.length === 0 && (
+          <p className="text-center text-gray-500 py-10 text-lg">
             No posts available at the moment.
           </p>
         )}

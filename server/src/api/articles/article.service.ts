@@ -93,6 +93,21 @@ export const ArticleService = {
     return result.rows.length > 0 ? (result.rows[0] as IArticle) : null;
   },
 
+  async findAllCategories(): Promise<string[]> {
+    try {
+      const result = await pool.query(
+        "SELECT DISTINCT category FROM articles WHERE category IS NOT NULL AND category <> '' ORDER BY category ASC"
+      );
+      return result.rows.map((row: { category: string }) => row.category);
+    } catch (error) {
+      console.error(
+        "[ArticleService.findAllCategories] Error fetching categories:",
+        error
+      );
+      throw new Error("Failed to fetch categories from database.");
+    }
+  },
+
   async create(
     articleData: ICreateArticleDTO,
     authorId: number
