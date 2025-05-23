@@ -206,8 +206,6 @@ export default function BlogEditor({
             }}
           />
         </div>
-        {/* Replace Textarea with a Rich Text Editor component for better UX later */}
-        {/* <YourRichTextEditor value={content} onChange={setContent} /> */}
       </div>
 
       <Button

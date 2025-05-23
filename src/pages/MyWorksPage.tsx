@@ -302,7 +302,7 @@ export default function MyWorksPage() {
                       {article.excerpt}
                     </p>
                   </div>
-                  <div className="flex flex-row sm:flex-col space-x-2 sm:space-x-0 sm:space-y-2 ml-0 sm:ml-4 flex-shrink-0 self-start sm:self-center">
+                  <div className="flex flex-row sm:flex-col space-x-0 sm:space-x-2 sm:space-y-2 ml-0 sm:ml-4 flex-shrink-0 self-start sm:self-center">
                     <Button
                       onClick={() => handleEdit(article.id)}
                       variant="outline"

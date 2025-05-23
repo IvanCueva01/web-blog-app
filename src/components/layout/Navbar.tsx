@@ -8,8 +8,25 @@ import {
   SheetTrigger,
   SheetClose,
 } from "@/components/ui/sheet";
-import { MenuIcon, SearchIcon, XIcon, LogOut } from "lucide-react";
+import {
+  MenuIcon,
+  SearchIcon,
+  XIcon,
+  LogOut,
+  User,
+  SettingsIcon,
+  ChevronDown,
+} from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 interface NavLinkItem {
   href: string;
@@ -21,6 +38,15 @@ const baseNavLinks: NavLinkItem[] = [
   { href: "/posts", label: "POSTS" },
   { href: "/features", label: "FEATURES" },
 ];
+
+const getInitials = (name: string = "") => {
+  const names = name.split(" ");
+  let initials = names[0] ? names[0][0] : "";
+  if (names.length > 1 && names[names.length - 1]) {
+    initials += names[names.length - 1][0];
+  }
+  return initials.toUpperCase() || "U"; // Default to 'U' if no name
+};
 
 export default function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -116,14 +142,79 @@ export default function Navbar() {
             </Button>
           </form>
           {!loading && currentUser ? (
-            <Button
-              onClick={handleLogout}
-              variant="outline"
-              className="border-orange-500 text-orange-500 hover:bg-orange-500 hover:text-white text-sm h-9 flex items-center space-x-2"
-            >
-              <LogOut size={16} />
-              <span>Logout</span>
-            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="ghost"
+                  className="flex items-center space-x-2 px-3 py-2 h-9 text-white hover:bg-slate-700 hover:text-orange-500"
+                >
+                  <Avatar className="h-6 w-6">
+                    <AvatarImage
+                      src={currentUser.avatar_url || undefined}
+                      alt={currentUser.username}
+                    />
+                    <AvatarFallback className="text-slate-900">
+                      {getInitials(currentUser.username)}
+                    </AvatarFallback>
+                  </Avatar>
+                  <span className="hidden sm:inline text-sm font-medium">
+                    {currentUser.username}
+                  </span>
+                  <ChevronDown className="h-4 w-4 hidden sm:inline" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent
+                className="w-56 bg-slate-800 border-slate-700 text-gray-200"
+                align="end"
+              >
+                <DropdownMenuLabel className="font-normal flex items-center space-x-2">
+                  <Avatar className="h-6 w-6">
+                    <AvatarImage
+                      src={currentUser.avatar_url || undefined}
+                      alt={currentUser.username}
+                    />
+                    <AvatarFallback className="text-slate-900">
+                      {getInitials(currentUser.username)}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="flex flex-col space-y-1">
+                    <p className="text-sm font-medium leading-none">
+                      {currentUser.username}
+                    </p>
+                    <p className="text-xs leading-none text-gray-400">
+                      {currentUser.email}
+                    </p>
+                  </div>
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator className="bg-slate-700" />
+                <DropdownMenuItem
+                  asChild
+                  className="text-orange-500 hover:bg-slate-700 hover:text-white focus:bg-slate-700 focus:text-white cursor-pointer"
+                >
+                  <Link to="/profile" className="flex items-center">
+                    <User className="mr-2 h-4 w-4" />
+                    <span>Profile</span>
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  asChild
+                  className="text-orange-500 hover:bg-slate-700 hover:text-white focus:bg-slate-700 focus:text-white cursor-pointer"
+                >
+                  <Link to="/settings" className="flex items-center">
+                    <SettingsIcon className="mr-2 h-4 w-4" />
+                    <span>Settings</span>
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator className="bg-slate-700" />
+                <DropdownMenuItem
+                  onClick={handleLogout}
+                  className="text-red-400 hover:bg-red-500 hover:text-white focus:bg-red-500 focus:text-white cursor-pointer"
+                >
+                  <LogOut className="mr-2 h-4 w-4" />
+                  <span>Logout</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           ) : (
             !loading && (
               <>
@@ -169,6 +260,58 @@ export default function Navbar() {
                 >
                   (D) <span className="font-normal">DevLog</span>
                 </Link>
+                {/* Mobile User Info and Actions */}
+                {!loading && currentUser && (
+                  <div className="pt-4 pb-2 border-b border-t border-gray-700 mb-4 flex flex-col">
+                    <div className="flex items-center space-x-3 px-1 mb-3">
+                      <Avatar className="h-10 w-10">
+                        <AvatarImage
+                          src={currentUser.avatar_url || undefined}
+                          alt={currentUser.username}
+                        />
+                        <AvatarFallback className="text-slate-900">
+                          {getInitials(currentUser.username)}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div>
+                        <p className="text-base font-medium leading-none text-white">
+                          {currentUser.username}
+                        </p>
+                        <p className="text-sm leading-none text-gray-400 mt-1">
+                          {currentUser.email}
+                        </p>
+                      </div>
+                    </div>
+                    <SheetClose asChild>
+                      <NavLink
+                        to="/profile"
+                        className={({ isActive }) =>
+                          `block w-full text-left py-2 px-3 text-lg rounded-md hover:bg-slate-700 hover:text-orange-500 transition-colors ${
+                            isActive ? "text-orange-500" : ""
+                          }`
+                        }
+                        onClick={() => setIsMobileMenuOpen(false)}
+                      >
+                        <User className="mr-2 h-5 w-5 inline-block" /> Profile
+                      </NavLink>
+                    </SheetClose>
+                    <SheetClose asChild>
+                      <NavLink
+                        to="/settings"
+                        className={({ isActive }) =>
+                          `block w-full text-left py-2 px-3 text-lg rounded-md hover:bg-slate-700 hover:text-orange-500 transition-colors ${
+                            isActive ? "text-orange-500" : ""
+                          }`
+                        }
+                        onClick={() => setIsMobileMenuOpen(false)}
+                      >
+                        <SettingsIcon className="mr-2 h-5 w-5 inline-block" />{" "}
+                        Settings
+                      </NavLink>
+                    </SheetClose>
+                  </div>
+                )}
+
                 <nav className="flex flex-col space-y-4">
                   {dynamicNavLinks.map((link: NavLinkItem) => (
                     <SheetClose asChild key={link.label}>
@@ -192,9 +335,9 @@ export default function Navbar() {
               <div className="mt-auto space-y-4 pt-6 border-t border-gray-700">
                 {!loading && currentUser ? (
                   <Button
-                    onClick={handleLogout}
+                    onClick={handleLogout} // handleLogout already closes sheet
                     variant="outline"
-                    className="border-orange-500 text-orange-500 hover:bg-orange-500 hover:text-white w-full flex items-center justify-center space-x-2"
+                    className="border-red-500 text-red-400 hover:bg-red-500 hover:text-white w-full flex items-center justify-center space-x-2"
                   >
                     <LogOut size={18} />
                     <span>Logout</span>
