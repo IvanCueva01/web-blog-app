@@ -1,11 +1,10 @@
 import { useState, useEffect } from "react";
 import { type Article } from "@/data/mockArticles"; // Assuming Article type is exported
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-// Consider a Rich Text Editor or Markdown Editor component for the 'content' field later
-// import { YourRichTextEditor } from '@/components/ui/your-rich-text-editor';
+import { CKEditor } from "@ckeditor/ckeditor5-react";
+import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
 
 interface BlogEditorProps {
   articleToEdit?: Article | null; // Pass an article to pre-fill the form for editing
@@ -31,10 +30,11 @@ export default function BlogEditor({
   isSubmitting,
 }: BlogEditorProps) {
   const [title, setTitle] = useState("");
-  const [content, setContent] = useState("");
+  const [content, setContent] = useState(""); // This will store HTML string from CKEditor
   const [category, setCategory] = useState("");
   const [imageLink, setImageLink] = useState("");
   const [slug, setSlug] = useState("");
+  const [excerpt, setExcerpt] = useState(""); // Added excerpt state
   // Add more fields as needed: authorImageLink, excerpt, etc.
 
   useEffect(() => {
@@ -44,15 +44,23 @@ export default function BlogEditor({
       setCategory(articleToEdit.category || "");
       setImageLink(articleToEdit.imageLink || "");
       setSlug(articleToEdit.slug || "");
+      setExcerpt(articleToEdit.excerpt || ""); // Set excerpt if editing
+    } else {
+      // Reset form for new post
+      setTitle("");
+      setContent("");
+      setCategory("");
+      setImageLink("");
+      setSlug("");
+      setExcerpt("");
     }
   }, [articleToEdit]);
 
   const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newTitle = e.target.value;
     setTitle(newTitle);
-    // Auto-generate slug from title, but allow manual override later if needed
-    if (!articleToEdit?.slug) {
-      // Or if a specific "auto-slug" checkbox is checked
+    if (!articleToEdit?.slug || !slug) {
+      // Auto-generate slug if not editing existing slug or if slug is empty
       setSlug(generateSlug(newTitle));
     }
   };
@@ -65,16 +73,18 @@ export default function BlogEditor({
       category,
       imageLink,
       slug,
-      // If editing, you might want to include the id: articleToEdit?.id
-      // publishDate and author would likely be set by the backend or context
+      excerpt, // Include excerpt in submitted data
     };
+    if (articleToEdit?.id) {
+      formData.id = articleToEdit.id; // Include ID if editing
+    }
     await onSubmit(formData);
   };
 
   return (
     <form
       onSubmit={handleSubmit}
-      className="space-y-6 p-4 md:p-6 max-w-2xl mx-auto bg-white shadow-md rounded-lg"
+      className="space-y-6 p-4 md:p-6 max-w-3xl mx-auto bg-white shadow-xl rounded-lg"
     >
       <div>
         <Label
@@ -111,7 +121,7 @@ export default function BlogEditor({
           className="focus:ring-orange-500 focus:border-orange-500"
         />
         <p className="mt-1 text-xs text-gray-500">
-          This will be part of the URL. Auto-generated from title.
+          Part of the URL. Auto-generated from title, can be manually edited.
         </p>
       </div>
 
@@ -156,22 +166,48 @@ export default function BlogEditor({
 
       <div>
         <Label
+          htmlFor="excerpt"
+          className="block text-sm font-medium text-gray-700 mb-1"
+        >
+          Excerpt (Short Summary)
+        </Label>
+        <Input
+          id="excerpt"
+          value={excerpt}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+            setExcerpt(e.target.value)
+          }
+          placeholder="A brief summary of your post (max 200 characters recommended)"
+          maxLength={250}
+          className="focus:ring-orange-500 focus:border-orange-500"
+        />
+        <p className="mt-1 text-xs text-gray-500">
+          A short description that will appear in post previews. If left empty,
+          it might be auto-generated from content.
+        </p>
+      </div>
+
+      <div>
+        <Label
           htmlFor="content"
           className="block text-sm font-medium text-gray-700 mb-1"
         >
           Content
         </Label>
-        <Textarea
-          id="content"
-          value={content}
-          onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
-            setContent(e.target.value)
-          }
-          placeholder="Write your blog post content here... Markdown is supported by default with a simple textarea, or integrate a rich text editor."
-          rows={10}
-          required
-          className="focus:ring-orange-500 focus:border-orange-500"
-        />
+        <div className="prose max-w-none">
+          <CKEditor
+            editor={ClassicEditor as any}
+            data={content}
+            onChange={(event: any, editor: any) => {
+              const data = editor.getData();
+              setContent(data);
+            }}
+            onReady={(editor) => {
+              const editable = editor.ui.getEditableElement();
+              editable.style.minHeight = "300px";
+            }}
+          />
+        </div>
         {/* Replace Textarea with a Rich Text Editor component for better UX later */}
         {/* <YourRichTextEditor value={content} onChange={setContent} /> */}
       </div>
@@ -179,7 +215,7 @@ export default function BlogEditor({
       <Button
         type="submit"
         disabled={isSubmitting}
-        className="w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold py-2 px-4 rounded-md disabled:opacity-70"
+        className="w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3 px-4 rounded-md disabled:opacity-70 text-lg"
       >
         {isSubmitting
           ? "Submitting..."

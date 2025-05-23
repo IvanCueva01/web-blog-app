@@ -57,7 +57,7 @@ function BlogCardPost({ article }: ArticleCardProps) {
           {article.category}
         </p>
         <CardTitle>
-          <Link to={`/blog/${article.slug}`}>{article.title}</Link>
+          <Link to={`/posts/${article.slug}`}>{article.title}</Link>
         </CardTitle>
         <CardDescription>{article.excerpt}</CardDescription>
       </CardHeader>

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { NavLink, useNavigate } from "react-router-dom";
+import { NavLink, useNavigate, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -8,13 +8,18 @@ import {
   SheetTrigger,
   SheetClose,
 } from "@/components/ui/sheet";
-import { MenuIcon, SearchIcon, XIcon } from "lucide-react";
+import { MenuIcon, SearchIcon, XIcon, LogOut } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
 
-const navLinks = [
+interface NavLinkItem {
+  href: string;
+  label: string;
+}
+
+const baseNavLinks: NavLinkItem[] = [
   { href: "/", label: "HOME" },
   { href: "/posts", label: "POSTS" },
   { href: "/features", label: "FEATURES" },
-  { href: "/my-works", label: "MY WORKS" },
 ];
 
 export default function Navbar() {
@@ -23,6 +28,7 @@ export default function Navbar() {
   const [searchQuery, setSearchQuery] = useState("");
   const [mobileSearchQuery, setMobileSearchQuery] = useState("");
   const [isScrolled, setIsScrolled] = useState(false);
+  const { currentUser, logout, loading } = useAuth();
 
   const handleSearchSubmit = (
     e: React.FormEvent<HTMLFormElement> | React.KeyboardEvent<HTMLInputElement>,
@@ -36,6 +42,18 @@ export default function Navbar() {
         setMobileSearchQuery("");
         setIsMobileMenuOpen(false);
       }
+    }
+  };
+
+  const dynamicNavLinks: NavLinkItem[] = currentUser
+    ? [...baseNavLinks, { href: "/my-works", label: "MY WORKS" }]
+    : baseNavLinks;
+
+  const handleLogout = () => {
+    logout();
+    navigate("/");
+    if (isMobileMenuOpen) {
+      setIsMobileMenuOpen(false);
     }
   };
 
@@ -61,7 +79,7 @@ export default function Navbar() {
         </NavLink>
 
         <nav className="hidden md:flex items-center space-x-6">
-          {navLinks.map((link) => (
+          {dynamicNavLinks.map((link: NavLinkItem) => (
             <NavLink
               key={link.label}
               to={link.href}
@@ -97,20 +115,35 @@ export default function Navbar() {
               <SearchIcon className="h-4 w-4" />
             </Button>
           </form>
-          <Button
-            onClick={() => navigate("/auth?view=login")}
-            variant="outline"
-            className="border-orange-500 text-orange-500 hover:bg-orange-500 hover:text-white text-sm h-9"
-          >
-            Login
-          </Button>
-          <Button
-            onClick={() => navigate("/auth?view=signup")}
-            variant="default"
-            className="bg-orange-500 text-white hover:bg-white text-sm h-9 border-orange-500 hover:text-orange-500 hover:border-orange-600"
-          >
-            Sign Up
-          </Button>
+          {!loading && currentUser ? (
+            <Button
+              onClick={handleLogout}
+              variant="outline"
+              className="border-orange-500 text-orange-500 hover:bg-orange-500 hover:text-white text-sm h-9 flex items-center space-x-2"
+            >
+              <LogOut size={16} />
+              <span>Logout</span>
+            </Button>
+          ) : (
+            !loading && (
+              <>
+                <Button
+                  onClick={() => navigate("/auth?view=login")}
+                  variant="outline"
+                  className="border-orange-500 text-orange-500 hover:bg-orange-500 hover:text-white text-sm h-9"
+                >
+                  Login
+                </Button>
+                <Button
+                  onClick={() => navigate("/auth?view=signup")}
+                  variant="default"
+                  className="bg-orange-500 text-white hover:bg-white text-sm h-9 border-orange-500 hover:text-orange-500 hover:border-orange-600"
+                >
+                  Sign Up
+                </Button>
+              </>
+            )
+          )}
         </div>
 
         <div className="md:hidden">
@@ -129,15 +162,15 @@ export default function Navbar() {
               className="w-[300px] sm:w-[400px] bg-slate-900 text-white p-6 flex flex-col"
             >
               <div className="flex flex-col space-y-6 flex-grow">
-                <NavLink
+                <Link
                   to="/"
                   className="text-2xl font-bold self-start"
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
-                  (W) <span className="font-normal">the blog</span>
-                </NavLink>
+                  (D) <span className="font-normal">DevLog</span>
+                </Link>
                 <nav className="flex flex-col space-y-4">
-                  {navLinks.map((link) => (
+                  {dynamicNavLinks.map((link: NavLinkItem) => (
                     <SheetClose asChild key={link.label}>
                       <NavLink
                         to={link.href}
@@ -157,26 +190,41 @@ export default function Navbar() {
                 </nav>
               </div>
               <div className="mt-auto space-y-4 pt-6 border-t border-gray-700">
-                <Button
-                  onClick={() => {
-                    navigate("/auth?view=login");
-                    setIsMobileMenuOpen(false);
-                  }}
-                  variant="outline"
-                  className="border-orange-500 text-orange-500 hover:bg-orange-500 hover:text-white w-full"
-                >
-                  Login
-                </Button>
-                <Button
-                  onClick={() => {
-                    navigate("/auth?view=signup");
-                    setIsMobileMenuOpen(false);
-                  }}
-                  variant="default"
-                  className="bg-orange-500 text-white hover:bg-orange-600 w-full border-orange-500 hover:border-orange-600"
-                >
-                  Sign Up
-                </Button>
+                {!loading && currentUser ? (
+                  <Button
+                    onClick={handleLogout}
+                    variant="outline"
+                    className="border-orange-500 text-orange-500 hover:bg-orange-500 hover:text-white w-full flex items-center justify-center space-x-2"
+                  >
+                    <LogOut size={18} />
+                    <span>Logout</span>
+                  </Button>
+                ) : (
+                  !loading && (
+                    <>
+                      <Button
+                        onClick={() => {
+                          navigate("/auth?view=login");
+                          setIsMobileMenuOpen(false);
+                        }}
+                        variant="outline"
+                        className="border-orange-500 text-orange-500 hover:bg-orange-500 hover:text-white w-full"
+                      >
+                        Login
+                      </Button>
+                      <Button
+                        onClick={() => {
+                          navigate("/auth?view=signup");
+                          setIsMobileMenuOpen(false);
+                        }}
+                        variant="default"
+                        className="bg-orange-500 text-white hover:bg-orange-600 w-full border-orange-500 hover:border-orange-600"
+                      >
+                        Sign Up
+                      </Button>
+                    </>
+                  )
+                )}
                 <form
                   onSubmit={(e) => handleSearchSubmit(e, mobileSearchQuery)}
                   className="relative"

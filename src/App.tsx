@@ -7,6 +7,10 @@ import HomePage from "./pages/HomePage"; // Import HomePage
 import PostsPage from "./pages/PostsPage"; // Import the new PostsPage
 import FeaturesPage from "./pages/FeaturesPage"; // Import the new FeaturesPage
 import CategoryPage from "./pages/CategoryPage"; // Import the new CategoryPage
+import MyWorksPage from "./pages/MyWorksPage"; // Import MyWorksPage
+import CreatePostPage from "./pages/CreatePostPage";
+import EditPostPage from "./pages/EditPostPage";
+import SinglePostPage from "./pages/SinglePostPage";
 // Import other pages as needed
 // import CreatePostPage from "./pages/CreatePostPage";
 // import EditPostPage from "./pages/EditPostPage";
@@ -22,12 +26,12 @@ function App() {
         <Route path="/posts" element={<PostsPage />} />{" "}
         <Route path="/features" element={<FeaturesPage />} />{" "}
         <Route path="/category/:categoryName" element={<CategoryPage />} />{" "}
-        {/* Route for specific category page */}
+        <Route path="/my-works" element={<MyWorksPage />} />{" "}
+        {/* Route for my works page */}
+        <Route path="/my-works/create" element={<CreatePostPage />} />
+        <Route path="/my-works/edit/:postId" element={<EditPostPage />} />
         {/* Route for all posts */}
-        {/* Example routes for later (you'll need to create these pages): */}
-        {/* <Route path="/posts/create" element={<CreatePostPage />} /> */}
-        {/* <Route path="/posts/:slug" element={<SinglePostPage />} /> */}
-        {/* <Route path="/posts/:slug/edit" element={<EditPostPage />} /> */}
+        <Route path="/posts/:slug" element={<SinglePostPage />} />
         {/* <Route path="/category/:categoryName" element={<CategoryPage />} /> */}
         {/* Add other specific routes here if they don't use MainLayout or have a different layout */}
         {/* For example, if MyBlogsPage uses MainLayout, you'd just add: */}

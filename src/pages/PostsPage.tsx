@@ -1,14 +1,13 @@
 import MainLayout from "@/components/layout/MainLayout";
 import BlogList from "@/components/blog/BlogList";
-import { mockArticles, type Article } from "@/data/mockArticles";
-import { useSearchParams } from "react-router-dom"; // To handle potential search queries
+import { mockArticles } from "@/data/mockArticles";
+import { useSearchParams } from "react-router-dom";
 import HeroSection from "@/components/layout/HeroSection";
 
 export default function PostsPage() {
   const [searchParams] = useSearchParams();
   const searchQuery = searchParams.get("q");
 
-  // Filter articles based on search query if present
   const filteredArticles = searchQuery
     ? mockArticles.filter(
         (article) =>
@@ -50,9 +49,11 @@ export default function PostsPage() {
         </div>
       </div>
 
-      {/* Pass all articles or filtered articles to BlogList */}
-      {/* The BlogList component itself has a container, so we don't need one here if BlogList uses its own full-width section */}
-      <BlogList articles={filteredArticles} />
+      <BlogList
+        articles={filteredArticles}
+        showPagination={true}
+        postsPerPage={9}
+      />
     </MainLayout>
   );
 }

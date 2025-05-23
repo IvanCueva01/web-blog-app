@@ -1,16 +1,35 @@
+export interface User {
+  id: string;
+  name: string;
+  email: string;
+  password?: string; // Password might not always be present, e.g., for social logins
+  avatar?: string;
+}
+
 export interface Article {
   id: string;
   title: string;
   content: string;
-  author: string;
-  authorImageLink?: string; // Optional, as not all authors might have an image
-  publishDate: string; // ISO 8601 format (e.g., "2023-10-27T10:00:00Z")
-  updatedDate: string; // ISO 8601 format
+  author: string; // Author's display name
+  authorId: string; // New field: ID of the author
+  authorImageLink?: string;
+  publishDate: string;
+  updatedDate: string;
   imageLink: string;
   category: string;
-  slug: string; // For URL-friendly links, e.g., "my-first-blog-post"
-  excerpt: string; // A short summary of the content
+  slug: string;
+  excerpt: string;
 }
+
+// Test User
+export const testUser: User = {
+  id: "user-001",
+  name: "Ivan Cueva",
+  email: "ivan.cueva@example.com",
+  password: "password123", // In a real app, this would be hashed
+  avatar:
+    "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80", // Example avatar
+};
 
 // Placeholder for author images - replace with actual or more diverse placeholders if needed
 export const genericAuthorImage =
@@ -24,6 +43,7 @@ export const mockArticles: Article[] = [
     content:
       "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. This article delves deep into React, Vue, and Svelte, comparing their strengths and ideal use cases.",
     author: "Alex Johnson",
+    authorId: "alex-johnson",
     authorImageLink:
       "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
     publishDate: "2023-01-15T09:30:00Z",
@@ -41,6 +61,7 @@ export const mockArticles: Article[] = [
     content:
       "Responsive web design is no longer a luxury but a necessity. This post explores advanced CSS techniques, flexbox, grid, and media queries to create truly adaptive layouts that look great on any device. We also touch upon mobile-first indexing and its importance. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
     author: "Maria Garcia",
+    authorId: "maria-garcia",
     authorImageLink:
       "https://images.unsplash.com/photo-1517365830460-955ce3ccd263?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
     publishDate: "2023-02-10T11:00:00Z",
@@ -58,6 +79,7 @@ export const mockArticles: Article[] = [
     content:
       "Tailwind CSS has revolutionized the way we write CSS. This guide will take you from the basics of utility-first CSS to building complex components. We cover setup, configuration, and practical examples. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
     author: "David Lee",
+    authorId: "david-lee",
     authorImageLink:
       "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
     publishDate: "2023-03-05T14:15:00Z",
@@ -76,6 +98,7 @@ export const mockArticles: Article[] = [
     content:
       "Asynchronous operations are fundamental in JavaScript. This article breaks down callbacks, explains the elegance of Promises, and shows the syntactic sugar of async/await. Includes practical examples for fetching data and handling timeouts. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.",
     author: "Sophia Chen",
+    authorId: "sophia-chen",
     authorImageLink: genericAuthorImage, // Using generic placeholder
     publishDate: "2023-04-22T08:00:00Z",
     updatedDate: "2023-04-25T12:30:00Z",
@@ -92,6 +115,7 @@ export const mockArticles: Article[] = [
     content:
       "Learn to build a robust RESTful API from scratch using Node.js and the Express framework. This tutorial covers routing, middleware, request handling, and connecting to a database. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
     author: "Kevin White",
+    authorId: "kevin-white",
     authorImageLink:
       "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
     publishDate: "2023-05-18T16:45:00Z",
@@ -109,6 +133,7 @@ export const mockArticles: Article[] = [
     content:
       "Web accessibility (a11y) ensures that websites are usable by people of all abilities and disabilities. This article discusses WCAG guidelines, ARIA attributes, and practical tips for making your web applications more inclusive. Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
     author: "Linda Green",
+    authorId: "linda-green",
     authorImageLink: genericAuthorImage,
     publishDate: "2023-06-12T10:20:00Z",
     updatedDate: "2023-06-15T11:00:00Z",
@@ -125,6 +150,7 @@ export const mockArticles: Article[] = [
     content:
       "Choosing the right API architecture is crucial for modern applications. This post compares GraphQL and REST, highlighting their differences, advantages, and disadvantages to help you make an informed decision for your next project. Ut enim ad minim veniam, quis nostrud exercitation.",
     author: "Robert Brown",
+    authorId: "robert-brown",
     authorImageLink:
       "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
     publishDate: "2023-07-01T13:00:00Z",
@@ -142,6 +168,7 @@ export const mockArticles: Article[] = [
     content:
       "Docker simplifies development and deployment. This beginner-friendly guide introduces Docker concepts, common commands, and how to containerize a web application. Includes a sample Dockerfile and docker-compose setup. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
     author: "Jessica Davis",
+    authorId: "jessica-davis",
     authorImageLink: genericAuthorImage,
     publishDate: "2023-08-14T09:00:00Z",
     updatedDate: "2023-08-16T14:00:00Z",
@@ -158,6 +185,7 @@ export const mockArticles: Article[] = [
     content:
       "Managing state in large React applications can be challenging. This article compares two popular solutions: React's Context API and Redux, discussing their pros, cons, and when to use each. Excepteur sint occaecat cupidatat non proident.",
     author: "Michael Wilson",
+    authorId: "michael-wilson",
     authorImageLink:
       "https://images.unsplash.com/photo-1521119989659-a83eee488004?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
     publishDate: "2023-09-02T11:30:00Z",
@@ -175,6 +203,7 @@ export const mockArticles: Article[] = [
     content:
       "Protecting your web applications from threats is paramount. This article covers essential cybersecurity best practices, including input validation, XSS prevention, CSRF protection, and secure authentication. Duis aute irure dolor in reprehenderit.",
     author: "Sarah Miller",
+    authorId: "sarah-miller",
     authorImageLink: genericAuthorImage,
     publishDate: "2023-10-25T10:00:00Z",
     updatedDate: "2023-10-27T16:00:00Z",
@@ -183,5 +212,57 @@ export const mockArticles: Article[] = [
     category: "Security",
     excerpt:
       "Learn essential cybersecurity measures to protect your web applications from common vulnerabilities and attacks.",
+  },
+  // New post for Ivan Cueva
+  {
+    id: "11",
+    title: "My Journey with React and TypeScript",
+    slug: "my-journey-react-typescript",
+    content:
+      "This is a personal reflection on my experiences developing web applications using React and TypeScript. I will share some insights, challenges, and tips I've learned along the way. Building modern UIs can be complex, but with the right tools and a good understanding of the ecosystem, it becomes a rewarding process. This blog post will cover project setup, component design, state management considerations, and type safety benefits.",
+    author: testUser.name, // Using testUser's name
+    authorId: testUser.id, // Using testUser's ID
+    authorImageLink: testUser.avatar,
+    publishDate: "2023-11-05T10:00:00Z",
+    updatedDate: "2023-11-05T10:00:00Z",
+    imageLink:
+      "https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    category: "React",
+    excerpt:
+      "A personal journey and insights into developing with React and TypeScript, covering setups, design, and state management.",
+  },
+  {
+    id: "12",
+    title: "My Journey with React and TypeScript",
+    slug: "my-journey-react-typescript",
+    content:
+      "This is a personal reflection on my experiences developing web applications using React and TypeScript. I will share some insights, challenges, and tips I've learned along the way. Building modern UIs can be complex, but with the right tools and a good understanding of the ecosystem, it becomes a rewarding process. This blog post will cover project setup, component design, state management considerations, and type safety benefits.",
+    author: testUser.name, // Using testUser's name
+    authorId: testUser.id, // Using testUser's ID
+    authorImageLink: testUser.avatar,
+    publishDate: "2023-11-05T10:00:00Z",
+    updatedDate: "2023-11-05T10:00:00Z",
+    imageLink:
+      "https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    category: "React",
+    excerpt:
+      "A personal journey and insights into developing with React and TypeScript, covering setups, design, and state management.",
+  },
+  {
+    id: "13",
+    title: "My Journey with React and TypeScript",
+    slug: "my-journey-react-typescript",
+    content:
+      "This is a personal reflection on my experiences developing web applications using React and TypeScript. I will share some insights, challenges, and tips I've learned along the way. Building modern UIs can be complex, but with the right tools and a good understanding of the ecosystem, it becomes a rewarding process. This blog post will cover project setup, component design, state management considerations, and type safety benefits.",
+    author: testUser.name, // Using testUser's name
+    authorId: testUser.id, // Using testUser's ID
+    authorImageLink: testUser.avatar,
+    publishDate: "2023-11-05T10:00:00Z",
+    updatedDate: "2023-11-05T10:00:00Z",
+    imageLink:
+      "https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    category: "React",
+    excerpt:
+      "A personal journey and insights into developing with React and TypeScript, covering setups, design, and state management.",
   },
 ];
