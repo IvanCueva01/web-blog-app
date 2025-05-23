@@ -10,6 +10,7 @@ import CreatePostPage from "./pages/CreatePostPage";
 import EditPostPage from "./pages/EditPostPage";
 import SinglePostPage from "./pages/SinglePostPage";
 import HandleTokenPage from "./pages/HandleTokenPage"; // Import HandleTokenPage
+import ProfilePage from "./pages/ProfilePage"; // Import ProfilePage
 
 function App() {
   return (
@@ -29,6 +30,8 @@ function App() {
         <Route path="/my-works/create" element={<CreatePostPage />} />
         <Route path="/my-works/edit/:postId" element={<EditPostPage />} />
         <Route path="/posts/:slug" element={<SinglePostPage />} />
+        <Route path="/profile" element={<ProfilePage />} />{" "}
+        {/* Add ProfilePage route */}
       </Routes>
     </BrowserRouter>
   );

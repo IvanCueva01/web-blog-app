@@ -43,4 +43,7 @@ router.get("/me", authenticateJwt, (req: any, res: any) => {
   res.status(200).json(userResponse);
 });
 
+// Route to update user profile (protected by JWT)
+router.put("/profile", authenticateJwt, AuthController.updateUserProfile);
+
 export default router;

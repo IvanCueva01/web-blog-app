@@ -143,5 +143,53 @@ export const AuthController = {
     // });
   },
 
-  // We will add googleLogin and googleCallback later
+  async updateUserProfile(req: Request, res: Response): Promise<void> {
+    try {
+      const userId = (req.user as IUser).id;
+      const { username, avatar_url } = req.body;
+
+      if (!userId) {
+        // This should not happen if authenticateJwt middleware is working correctly
+        res.status(401).json({ message: "Unauthorized. User ID not found." });
+        return;
+      }
+
+      // Prepare data for update - only include fields that are present in the request
+      const updateData: Partial<IUser> = { id: userId };
+      if (username !== undefined) {
+        updateData.username = username;
+      }
+      if (avatar_url !== undefined) {
+        updateData.avatar_url = avatar_url;
+      }
+
+      // Check if there's anything to update
+      if (Object.keys(updateData).length <= 1 && updateData.id) {
+        // only id means no actual data to update
+        // Optionally, you could return the current user data or a specific message
+        // For now, let's assume client sends at least one field to update
+        // Or fetch current user and return if no actual changes.
+        // Let's proceed assuming the service handles no-change updates gracefully or we expect actual changes.
+      }
+
+      const updatedUser = await AuthService.upsertUser(updateData);
+
+      // Exclude password_hash from the response
+      const userResponse: Partial<IUser> = { ...updatedUser };
+      delete userResponse.password_hash;
+      delete userResponse.google_id;
+
+      res.status(200).json({
+        message: "Profile updated successfully",
+        user: userResponse,
+      });
+    } catch (error) {
+      console.error("[AuthController.updateUserProfile] Error:", error);
+      // Consider more specific error handling, e.g., for duplicate username if a unique constraint exists
+      res.status(500).json({
+        message: "Error updating profile",
+        error: (error as Error).message,
+      });
+    }
+  },
 };

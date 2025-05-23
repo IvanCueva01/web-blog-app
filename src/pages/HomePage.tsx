@@ -1,8 +1,7 @@
 import { Link } from "react-router-dom";
 import MainLayout from "@/components/layout/MainLayout";
-import { Button } from "@/components/ui/button";
 import HeroSection from "@/components/layout/HeroSection";
-// import { Separator } from "@/components/ui/separator"; // Temporarily removed
+import { Separator } from "@/components/ui/separator";
 import BlogCardPost from "@/components/blog/BlogCardPost";
 import type { IArticleFrontEnd } from "@/types/article.types";
 import { articleService } from "@/services/articleService";
@@ -74,10 +73,7 @@ export default function HomePage() {
               No posts available at the moment.
             </p>
           )}
-
-          {/* <Separator className="my-8 md:my-12" /> */}
-          {/* Temporarily removed */}
-
+          <Separator className="my-8 md:my-12" />
           <div className="text-center mt-8 md:mt-12">
             <h3 className="text-2xl font-semibold mb-4">More to Explore</h3>
             <p className="text-gray-600 mb-6">

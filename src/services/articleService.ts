@@ -166,7 +166,6 @@ async function getMyArticles(
   params?: GetMyArticlesParams
 ): Promise<GetArticlesResponse> {
   try {
-    // Backend response structure is consistent with getAllArticles
     type BackendApiResponse = {
       message: string;
       data: IArticleFrontEnd[];
@@ -178,10 +177,18 @@ async function getMyArticles(
       };
     };
 
+    // Map frontend `searchTerm` to backend `q`
+    const apiParams: Record<string, any> = {};
+    if (params) {
+      if (params.limit !== undefined) apiParams.limit = params.limit;
+      if (params.offset !== undefined) apiParams.offset = params.offset;
+      if (params.searchTerm !== undefined) apiParams.q = params.searchTerm; // Renaming here
+    }
+
     const response = await apiClient.get<BackendApiResponse>(
       "/articles/my-articles",
       {
-        params, // Axios will automatically serialize this into query string (limit, offset, q for searchTerm)
+        params: apiParams, // Use the mapped params
       }
     );
     return {

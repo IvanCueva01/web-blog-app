@@ -80,25 +80,6 @@ export default function SinglePostPage() {
       try {
         const fetchedArticle = await articleService.getArticleBySlug(slug);
         setArticle(fetchedArticle);
-
-        if (fetchedArticle) {
-          // Fetch recent posts (excluding the current one)
-          setIsLoadingRecent(true);
-          try {
-            const recentResponse = await articleService.getAllArticles({
-              limit: 4, // Get 3 recent + current one just in case it appears, then filter
-            });
-            setRecentPosts(
-              (recentResponse.articles || [])
-                .filter((p) => p.slug !== slug)
-                .slice(0, 3)
-            );
-          } catch (recentError) {
-            console.error("Failed to fetch recent posts:", recentError);
-          } finally {
-            setIsLoadingRecent(false);
-          }
-        }
       } catch (err: any) {
         console.error(`Failed to fetch article by slug ${slug}:`, err);
         setError(
@@ -107,6 +88,24 @@ export default function SinglePostPage() {
         setArticle(null); // Explicitly set to null on error
       } finally {
         setIsLoading(false);
+      }
+
+      // Fetch recent posts
+      setIsLoadingRecent(true);
+      try {
+        const recentResponse = await articleService.getAllArticles({
+          limit: 4, // Fetch 4 to filter one out and get up to 3
+        });
+        setRecentPosts(
+          (recentResponse.articles || [])
+            .filter((p) => p.slug !== slug) // Filter out current article
+            .slice(0, 3) // Take top 3
+        );
+      } catch (recentError) {
+        console.error("Failed to fetch recent posts:", recentError);
+        setRecentPosts([]); // Set to empty on error
+      } finally {
+        setIsLoadingRecent(false);
       }
     };
 
@@ -159,9 +158,9 @@ export default function SinglePostPage() {
     <MainLayout>
       <HeroSection title={article.title} imageUrl={article.image_url} />
       <div className="container mx-auto px-4 py-8 md:py-16">
-        <div className="lg:flex lg:space-x-12">
-          {/* Main Content Column */}
-          <article className="lg:w-2/3 xl:w-3/4 space-y-8">
+        <div className="lg:flex lg:gap-x-12">
+          {/* Main Content Column - Added min-w-0 */}
+          <article className="lg:w-2/3 xl:w-3/4 space-y-8 min-w-0">
             <header className="space-y-4">
               <h1 className="text-4xl md:text-5xl font-extrabold text-gray-900 tracking-tight">
                 {article.title}
@@ -207,10 +206,45 @@ export default function SinglePostPage() {
               />
             )}
 
-            <div
-              className="prose prose-lg max-w-none dark:prose-invert prose-img:rounded-xl prose-headings:text-gray-800 prose-a:text-orange-600 hover:prose-a:text-orange-700"
-              dangerouslySetInnerHTML={{ __html: article.content }}
-            />
+            {/* Assuming article.content is HTML and uses Tailwind Typography prose class */}
+            {article.content && (
+              <div
+                className="prose prose-orange lg:prose-xl max-w-none dark:prose-invert break-words"
+                dangerouslySetInnerHTML={{ __html: article.content }}
+              />
+            )}
+
+            {/* Author Bio Section (Example - if you want to add one) */}
+            {article.author && (
+              <section className="mt-12 pt-8 border-t border-gray-200 dark:border-gray-700">
+                <h2 className="text-2xl font-semibold text-gray-800 dark:text-gray-200 mb-4">
+                  About the Author
+                </h2>
+                <div className="flex items-start space-x-4 p-4 bg-slate-50 dark:bg-slate-800 rounded-lg">
+                  <Avatar className="h-16 w-16">
+                    {authorAvatarUrl ? (
+                      <AvatarImage
+                        src={authorAvatarUrl}
+                        alt={authorName || "Author"}
+                      />
+                    ) : null}
+                    <AvatarFallback className="text-xl">
+                      {authorInitials}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div>
+                    <h3 className="text-xl font-bold text-gray-900 dark:text-white">
+                      {authorName || "Anonymous Author"}
+                    </h3>
+                    {/* Add a placeholder for bio if you plan to have one in user profile */}
+                    <p className="text-gray-600 dark:text-gray-400 mt-1">
+                      More information about the author will be available soon.
+                      Stay tuned for updates on their work and contributions!
+                    </p>
+                  </div>
+                </div>
+              </section>
+            )}
 
             <div className="pt-8 border-t border-gray-200">
               <h3 className="text-2xl font-semibold text-gray-800 mb-4">
@@ -221,104 +255,104 @@ export default function SinglePostPage() {
           </article>
 
           {/* Sidebar Column */}
-          <aside className="lg:w-1/3 xl:w-1/4 mt-12 lg:mt-0">
-            <div className="sticky top-24 space-y-8 p-6 bg-slate-50 rounded-lg shadow">
-              <section>
-                <h2 className="text-xl font-semibold text-gray-800 mb-4 border-b pb-2">
-                  Categories
-                </h2>
-                {isLoadingCategories && (
-                  <p className="text-sm text-gray-500">Loading categories...</p>
-                )}
-                {!isLoadingCategories && uniqueCategories.length === 0 && (
-                  <p className="text-sm text-gray-500">No categories found.</p>
-                )}
-                {!isLoadingCategories && uniqueCategories.length > 0 && (
-                  <ul className="space-y-2">
-                    {uniqueCategories.map((category) => (
-                      <li key={category}>
-                        <Link
-                          to={`/category/${encodeURIComponent(
-                            category.toLowerCase()
-                          )}`}
-                          className="text-gray-700 hover:text-orange-600 hover:underline transition-colors block py-1"
-                        >
-                          {category}
-                        </Link>
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </section>
-
-              <section>
-                <h2 className="text-xl font-semibold text-gray-800 mb-4 border-b pb-2">
+          <aside className="lg:w-1/3 xl:w-1/4 mt-12 lg:mt-0 space-y-8">
+            {/* Recent Posts Section */}
+            {!isLoadingRecent && recentPosts.length > 0 && (
+              <div className="p-6 bg-slate-50 dark:bg-slate-800 rounded-lg shadow">
+                <h3 className="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-6">
                   Recent Posts
-                </h2>
-                {isLoadingRecent && (
-                  <p className="text-sm text-gray-500">Loading recent...</p>
-                )}
-                {!isLoadingRecent && recentPosts.length === 0 && (
-                  <p className="text-sm text-gray-500">
-                    No recent posts found.
-                  </p>
-                )}
-                {!isLoadingRecent && recentPosts.length > 0 && (
-                  <ul className="space-y-4">
-                    {recentPosts.map((post) => (
-                      <li key={post.id} className="flex space-x-3">
-                        {post.image_url && (
-                          <Link
-                            to={`/posts/${post.slug}`}
-                            className="flex-shrink-0"
-                          >
-                            <img
-                              src={post.image_url}
-                              alt={post.title}
-                              className="w-20 h-20 object-cover rounded-md hover:opacity-80 transition-opacity"
-                            />
-                          </Link>
-                        )}
-                        {!post.image_url && (
-                          <div className="w-20 h-20 bg-gray-200 rounded-md flex-shrink-0 flex items-center justify-center">
-                            <span className="text-xs text-gray-400">
-                              No Image
+                </h3>
+                <ul className="space-y-6">
+                  {recentPosts.map((post) => (
+                    <li
+                      key={post.id}
+                      className="flex space-x-4 items-start group"
+                    >
+                      {post.image_url && (
+                        <Link
+                          to={`/posts/${post.slug}`}
+                          className="flex-shrink-0 block w-24 h-24 rounded-lg overflow-hidden shadow-md"
+                        >
+                          <img
+                            src={post.image_url}
+                            alt={post.title}
+                            className="w-full h-full object-cover transition-transform duration-300 ease-in-out group-hover:scale-110"
+                          />
+                        </Link>
+                      )}
+                      <div
+                        className={`flex-grow ${
+                          post.image_url ? "w-[calc(100%-7rem)]" : "w-full"
+                        }`}
+                      >
+                        <Link to={`/posts/${post.slug}`} title={post.title}>
+                          <h4 className="text-md font-semibold text-gray-800 dark:text-gray-100 group-hover:text-orange-600 dark:group-hover:text-orange-400 transition-colors duration-200 line-clamp-2">
+                            {post.title}
+                          </h4>
+                        </Link>
+                        {post.author && (
+                          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                            By{" "}
+                            <span className="font-medium text-gray-700 dark:text-gray-300">
+                              {post.author.username}
                             </span>
-                          </div>
+                          </p>
                         )}
-                        <div className="flex-grow">
-                          <h3 className="text-sm font-semibold leading-tight mb-1">
-                            <Link
-                              to={`/posts/${post.slug}`}
-                              className="text-gray-800 hover:text-orange-600 transition-colors"
-                            >
-                              {post.title}
-                            </Link>
-                          </h3>
-                          {post.author && (
-                            <p className="text-xs text-gray-500 mb-1">
-                              By {post.author.username} &bull;{" "}
-                              {formatDate(post.published_at, {
-                                month: "short",
-                                day: "numeric",
-                                year: "numeric",
-                              })}
-                            </p>
-                          )}
-                          {post.excerpt && (
-                            <p className="text-xs text-gray-600 leading-snug">
-                              {post.excerpt.length > 60
-                                ? `${post.excerpt.substring(0, 60)}...`
-                                : post.excerpt}
-                            </p>
-                          )}
-                        </div>
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </section>
-            </div>
+                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                          {formatDate(post.published_at)}
+                        </p>
+                        {post.excerpt && (
+                          <p className="text-sm text-gray-600 dark:text-gray-300 mt-2 line-clamp-3">
+                            {post.excerpt}
+                          </p>
+                        )}
+                        {!post.excerpt && post.content && (
+                          <p
+                            className="text-sm text-gray-600 dark:text-gray-300 mt-2 line-clamp-3"
+                            title="Excerpt from content"
+                          >
+                            {`${post.content
+                              .replace(/<[^>]+>/g, "")
+                              .substring(0, 120)}...`}
+                          </p>
+                        )}
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            {/* Categories Section - Limited to 12 */}
+            {!isLoadingCategories && uniqueCategories.length > 0 && (
+              <div className="p-6 bg-slate-50 dark:bg-slate-800 rounded-lg shadow">
+                <h3 className="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-4">
+                  Categories
+                </h3>
+                <ul className="space-y-2">
+                  {uniqueCategories.slice(0, 12).map((category) => (
+                    <li key={category}>
+                      <Link
+                        to={`/category/${encodeURIComponent(category)}`}
+                        className="text-gray-700 dark:text-gray-300 hover:text-orange-600 dark:hover:text-orange-500 hover:underline transition-colors"
+                      >
+                        {category}
+                      </Link>
+                    </li>
+                  ))}
+                  {uniqueCategories.length > 12 && (
+                    <li>
+                      <Link
+                        to="/features"
+                        className="text-sm text-orange-600 dark:text-orange-500 hover:underline font-medium"
+                      >
+                        View all categories...
+                      </Link>
+                    </li>
+                  )}
+                </ul>
+              </div>
+            )}
           </aside>
         </div>
       </div>

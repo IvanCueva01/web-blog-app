@@ -54,14 +54,26 @@ export const ArticleService = {
       whereString = ` WHERE ${whereClauses.join(" AND ")}`;
     }
 
-    const fullQuerySelect = `${baseQuerySelect}${whereString} ORDER BY a.published_at DESC LIMIT $${paramIndex++} OFFSET $${paramIndex++}`;
-    const selectQueryParams = [...queryParams, limit, offset];
+    let finalSelectParams = [...queryParams];
+    let finalCountParams = [...queryParams];
 
-    const fullQueryCount = `${baseQueryCount}${whereString}`;
-    const countQueryParams = [...queryParams];
+    let queryForSelect = `${baseQuerySelect}${whereString} ORDER BY a.published_at DESC`;
+    let queryForCount = `${baseQueryCount}${whereString}`;
 
-    const articlesResult = await pool.query(fullQuerySelect, selectQueryParams);
-    const totalCountResult = await pool.query(fullQueryCount, countQueryParams);
+    queryForSelect += ` LIMIT $${paramIndex++} OFFSET $${paramIndex++}`;
+    finalSelectParams.push(limit, offset);
+
+    // console.log("--- Debug ArticleService.findAll ---");
+    // console.log("Filters received:", JSON.stringify(filters));
+    // console.log("Limit:", limit, "Offset:", offset);
+    // console.log("Executing SQL for SELECT:", queryForSelect);
+    // console.log("Parameters for SELECT:", finalSelectParams);
+    // console.log("Executing SQL for COUNT:", queryForCount);
+    // console.log("Parameters for COUNT:", finalCountParams);
+    // console.log("-------------------------------------");
+
+    const articlesResult = await pool.query(queryForSelect, finalSelectParams);
+    const totalCountResult = await pool.query(queryForCount, finalCountParams);
 
     return {
       articles: articlesResult.rows as IArticle[],
