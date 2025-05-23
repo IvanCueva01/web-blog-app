@@ -1,6 +1,8 @@
 import { Router } from "express";
 import { AuthController } from "./auth.controller";
 import passport from "@/config/passport.config";
+import { authenticateJwt } from "@/middleware/auth.middleware";
+import { IUser } from "@/interfaces/user.interface";
 
 const router = Router();
 
@@ -24,5 +26,21 @@ router.get(
   }),
   AuthController.googleCallback
 );
+
+// Route to get current authenticated user (protected by JWT)
+router.get("/me", authenticateJwt, (req: any, res: any) => {
+  // If authenticateJwt passes, req.user will be populated
+  const user = req.user as IUser;
+  // Send back user information, excluding sensitive data like password_hash or google_id if not needed by client
+  const userResponse: Partial<IUser> = {
+    id: user.id,
+    username: user.username,
+    email: user.email,
+    avatar_url: user.avatar_url,
+    created_at: user.created_at,
+    updated_at: user.updated_at,
+  };
+  res.status(200).json(userResponse);
+});
 
 export default router;

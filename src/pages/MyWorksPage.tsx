@@ -1,4 +1,3 @@
-import React from "react";
 import MainLayout from "@/components/layout/MainLayout";
 import { Button } from "@/components/ui/button";
 import {
@@ -96,10 +95,12 @@ export default function MyWorksPage() {
             <Link to="/my-works/create">
               {" "}
               {/* Placeholder for Create Post Page */}
-              <Button className="bg-orange-500 hover:bg-orange-600 text-white flex items-center space-x-2">
-                <PlusCircle size={20} />
-                <span>Add New Post</span>
-              </Button>
+              {myArticles.length >= 1 && (
+                <Button className="bg-orange-500 hover:bg-orange-600 text-white flex items-center space-x-2">
+                  <PlusCircle size={20} />
+                  <span>Add New Post</span>
+                </Button>
+              )}
             </Link>
           </div>
 

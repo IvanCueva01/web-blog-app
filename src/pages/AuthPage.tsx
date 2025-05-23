@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
 import { useSearchParams, Link } from "react-router-dom";
-import { LoginForm } from "@/components/login-form";
+import { LoginForm } from "@/components/auth/LoginForm";
 import SignupForm from "@/components/auth/SignupForm";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, PartyPopper } from "lucide-react";
 
 const LOGIN_IMAGE_URL =
   "https://images.unsplash.com/photo-1612681336352-b8b82f3c775a?q=80&w=1925&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D";
@@ -13,14 +13,24 @@ const SIGNUP_IMAGE_URL =
 export default function AuthPage() {
   const [searchParams] = useSearchParams();
   const [isLoginView, setIsLoginView] = useState(true);
+  const [showRegisteredMessage, setShowRegisteredMessage] = useState(false);
 
   useEffect(() => {
     const view = searchParams.get("view");
+    const registered = searchParams.get("registered");
+
     setIsLoginView(view !== "signup");
+
+    if (view !== "signup" && registered === "true") {
+      setShowRegisteredMessage(true);
+    } else {
+      setShowRegisteredMessage(false);
+    }
   }, [searchParams]);
 
   const toggleView = () => {
     setIsLoginView(!isLoginView);
+    setShowRegisteredMessage(false);
   };
 
   return (
@@ -38,7 +48,7 @@ export default function AuthPage() {
           <Link to="/">
             <Button
               variant="ghost"
-              className="flex items-center space-x-2 text-gray-700 hover:text-orange-500 bg-white"
+              className="flex items-center space-x-2 text-gray-700 hover:text-orange-500 bg-white shadow-sm"
             >
               <ArrowLeft size={18} />
               <span>Back to Home</span>
@@ -46,10 +56,16 @@ export default function AuthPage() {
           </Link>
         </div>
 
-        <div className="w-full max-w-md space-y-6 bg-white p-8 md:p-10 rounded-xl shadow-2xl mt-16 md:mt-0">
+        <div className="w-full max-w-sm">
           {isLoginView ? (
             <>
-              <h2 className="text-3xl font-bold text-center text-gray-800">
+              {showRegisteredMessage && (
+                <div className="mb-4 p-3 bg-green-100 border border-green-300 text-green-700 rounded-md text-sm flex items-center justify-center">
+                  <PartyPopper size={20} className="mr-2 text-green-600" />
+                  <span>Registration successful! Please log in.</span>
+                </div>
+              )}
+              <h2 className="text-2xl md:text-3xl font-bold text-center text-gray-800">
                 Welcome Back!
               </h2>
               <p className="text-center text-sm text-gray-600 mb-6">
@@ -69,7 +85,7 @@ export default function AuthPage() {
             </>
           ) : (
             <>
-              <h2 className="text-3xl font-bold text-center text-gray-800">
+              <h2 className="text-2xl md:text-3xl font-bold text-center text-gray-800">
                 Create Your Account
               </h2>
               <p className="text-center text-sm text-gray-600 mb-6">

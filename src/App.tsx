@@ -9,6 +9,7 @@ import MyWorksPage from "./pages/MyWorksPage"; // Import MyWorksPage
 import CreatePostPage from "./pages/CreatePostPage";
 import EditPostPage from "./pages/EditPostPage";
 import SinglePostPage from "./pages/SinglePostPage";
+import HandleTokenPage from "./pages/HandleTokenPage"; // Import HandleTokenPage
 
 function App() {
   return (
@@ -17,6 +18,8 @@ function App() {
         <Route path="/" element={<HomePage />} />{" "}
         {/* Set HomePage as the default route */}
         <Route path="/auth" element={<AuthPage />} />
+        <Route path="/auth/handle-token" element={<HandleTokenPage />} />{" "}
+        {/* Add route for HandleTokenPage */}
         {/* Route for all posts */}
         <Route path="/posts" element={<PostsPage />} />{" "}
         <Route path="/features" element={<FeaturesPage />} />{" "}

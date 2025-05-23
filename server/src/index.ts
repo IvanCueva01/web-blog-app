@@ -3,6 +3,7 @@ import dotenv from "dotenv";
 import cors from "cors";
 import { testDatabaseConnection } from "@/config/database"; // Changed to aliased path
 import authRoutes from "@/api/auth/auth.routes"; // Changed to aliased path
+import articleRoutes from "@/api/articles/article.routes"; // Import article routes
 import passport from "@/config/passport.config"; // Import configured passport
 
 // Load environment variables
@@ -21,6 +22,7 @@ app.use(passport.initialize());
 
 // API Routes
 app.use("/api/auth", authRoutes); // Use auth routes with /api/auth prefix
+app.use("/api/articles", articleRoutes); // Use article routes with /api/articles prefix
 
 // Simple route for testing
 app.get("/", (req: Request, res: Response) => {
